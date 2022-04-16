@@ -7,6 +7,7 @@ wn = turtle.Screen()
 wn.setup(SCREEN_WIDTH, SCREEN_HEIGHT)
 wn.title("Space Arena! by @TokyoEdTech")
 wn.bgcolor("black")
+wn.tracer(0)
 
 pen = turtle.Turtle()
 pen.speed(0)
@@ -22,6 +23,12 @@ class Sprite():
         self.y = y
         self.shape = shape
         self.color = color
+        self.dx = 0
+        self.dy = 0
+        
+    def update(self):
+        self.x += self.dx
+        self.y += self.dy
         
     def render(self, pen):
         pen.goto(self.x, self.y)
@@ -31,12 +38,36 @@ class Sprite():
         
 # Create player sprite
 player = Sprite(0, 0, "triangle", "white")
-player.render(pen)
+player.dx = 1
+player.dy = 0.5
 
 enemy = Sprite(0, 100, "square", "red")
-enemy.render(pen)
+enemy.dx = -1
+enemy.dy = -0.3
 
 powerup = Sprite(0, -100, "circle", "blue")
-powerup.render(pen)
+powerup.dy = 1
+powerup.dx = 0.1
 
-wn.mainloop()
+# Sprites list
+sprites = []
+sprites.append(player)
+sprites.append(enemy)
+sprites.append(powerup)
+
+# Main Loop
+while True:
+    # Clear screen
+    pen.clear()
+    
+    # Do game stuff
+    # Update sprites
+    for sprite in sprites:
+        sprite.update()
+
+    # Render sprites
+    for sprite in sprites:
+        sprite.render(pen)
+        
+    # Update the screen
+    wn.update()
