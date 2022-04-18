@@ -1,4 +1,5 @@
 import turtle
+import math
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -27,11 +28,19 @@ class Sprite():
         self.dy = 0
         self.heading = 0
         self.da = 0
+        self.thrust = 0.0
+        self.acceleration = 0.2
         
     def update(self):
+        
+        self.heading += self.da
+        self.heading %= 360
+        
+        self.dx += math.cos(math.radians(self.heading)) * self.thrust
+        self.dy += math.sin(math.radians(self.heading)) * self.thrust
+        
         self.x += self.dx
         self.y += self.dy
-        self.heading += self.da
         
     def render(self, pen):
         pen.goto(self.x, self.y)
@@ -43,7 +52,7 @@ class Sprite():
 class Player(Sprite):
     def __init__(self, x, y, shape, color):
         Sprite.__init__(self, 0, 0, shape, color)
-        self.lives = 3
+        self.lives = 4
         self.score = 0
         self.heading = 90
         self.da = 0
@@ -56,6 +65,22 @@ class Player(Sprite):
         
     def stop_rotation(self):
         self.da = 0
+        
+    def accelerate(self):
+        self.thrust += self.acceleration
+        
+    def decelerate(self):
+        self.thrust = 0.0
+        
+    def render(self, pen):
+        pen.shapesize(0.5, 1.0, None)
+        pen.goto(self.x, self.y)
+        pen.setheading(self.heading)
+        pen.shape(self.shape)
+        pen.color(self.color)
+        pen.stamp()
+        
+        pen.shapesize(1.0, 1.0, None)
 
 # Create player sprite
 player = Player(0, 0, "triangle", "white")
@@ -81,6 +106,9 @@ wn.onkeypress(player.rotate_right, "Right")
 
 wn.onkeyrelease(player.stop_rotation, "Left")
 wn.onkeyrelease(player.stop_rotation, "Right")
+
+wn.onkeypress(player.accelerate, "Up")
+wn.onkeyrelease(player.decelerate, "Up")
 
 # Main Loop
 while True:
