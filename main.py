@@ -1,128 +1,139 @@
-import turtle
+# -*- coding: utf-8 -*-
+
+import pygame
+import random
 import math
+from Player import Player
+from Enemy import Enemy
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+pygame.init()
+size    = (800, 600)
+BGCOLOR = (255, 255, 255)
+screen = pygame.display.set_mode(size)
+scoreFont = pygame.font.Font("fonts/UpheavalPro.ttf", 30)
+healthFont = pygame.font.Font("fonts/OmnicSans.ttf", 50)
+healthRender = healthFont.render('z', True, pygame.Color('red'))
+pygame.display.set_caption("Top Down")
 
-wn = turtle.Screen()
-wn.setup(SCREEN_WIDTH, SCREEN_HEIGHT)
-wn.title("Space Arena! by @TokyoEdTech")
-wn.bgcolor("black")
-wn.tracer(0)
+done = False
+hero = pygame.sprite.GroupSingle(Player(screen.get_size()))
+enemies = pygame.sprite.Group()
+lastEnemy = 0
+score = 0
+clock = pygame.time.Clock()
 
-pen = turtle.Turtle()
-pen.speed(0)
-pen.shape("square")
-pen.color("white")
-pen.penup()
-pen.hideturtle()
+def move_entities(hero, enemies, timeDelta):
+    score = 0
+    hero.sprite.move(screen.get_size(), timeDelta)
+    for enemy in enemies:
+        enemy.move(enemies, hero.sprite.rect.topleft, timeDelta)
+        enemy.shoot(hero.sprite.rect.topleft)
+    for proj in Enemy.projectiles:
+        proj.move(screen.get_size(), timeDelta)
+        if pygame.sprite.spritecollide(proj, hero, False):
+            proj.kill()
+            hero.sprite.health -= 1
+            if hero.sprite.health <= 0:
+                hero.sprite.alive = False
+    for proj in Player.projectiles:
+        proj.move(screen.get_size(), timeDelta)
+        enemiesHit = pygame.sprite.spritecollide(proj, enemies, True)
+        if enemiesHit:
+            proj.kill()
+            score += len(enemiesHit)
+    return score
 
-class Sprite():
-    # Constructor
-    def __init__(self, x, y, shape, color):
-        self.x = x
-        self.y = y
-        self.shape = shape
-        self.color = color
-        self.dx = 0
-        self.dy = 0
-        self.heading = 0
-        self.da = 0
-        self.thrust = 0.0
-        self.acceleration = 0.2
-        
-    def update(self):
-        
-        self.heading += self.da
-        self.heading %= 360
-        
-        self.dx += math.cos(math.radians(self.heading)) * self.thrust
-        self.dy += math.sin(math.radians(self.heading)) * self.thrust
-        
-        self.x += self.dx
-        self.y += self.dy
-        
-    def render(self, pen):
-        pen.goto(self.x, self.y)
-        pen.setheading(self.heading)
-        pen.shape(self.shape)
-        pen.color(self.color)
-        pen.stamp()
-
-class Player(Sprite):
-    def __init__(self, x, y, shape, color):
-        Sprite.__init__(self, 0, 0, shape, color)
-        self.lives = 4
-        self.score = 0
-        self.heading = 90
-        self.da = 0
-        
-    def rotate_left(self):
-        self.da = 5
-        
-    def rotate_right(self):
-        self.da = -5
-        
-    def stop_rotation(self):
-        self.da = 0
-        
-    def accelerate(self):
-        self.thrust += self.acceleration
-        
-    def decelerate(self):
-        self.thrust = 0.0
-        
-    def render(self, pen):
-        pen.shapesize(0.5, 1.0, None)
-        pen.goto(self.x, self.y)
-        pen.setheading(self.heading)
-        pen.shape(self.shape)
-        pen.color(self.color)
-        pen.stamp()
-        
-        pen.shapesize(1.0, 1.0, None)
-
-# Create player sprite
-player = Player(0, 0, "triangle", "white")
-
-enemy = Sprite(0, 100, "square", "red")
-enemy.dx = -1
-enemy.dy = -0.3
-
-powerup = Sprite(0, -100, "circle", "blue")
-powerup.dy = 1
-powerup.dx = 0.1
-
-# Sprites list
-sprites = []
-sprites.append(player)
-sprites.append(enemy)
-sprites.append(powerup)
-
-# Keyboard bindings
-wn.listen()
-wn.onkeypress(player.rotate_left, "Left")
-wn.onkeypress(player.rotate_right, "Right")
-
-wn.onkeyrelease(player.stop_rotation, "Left")
-wn.onkeyrelease(player.stop_rotation, "Right")
-
-wn.onkeypress(player.accelerate, "Up")
-wn.onkeyrelease(player.decelerate, "Up")
-
-# Main Loop
-while True:
-    # Clear screen
-    pen.clear()
+def render_entities(hero, enemies):
+    hero.sprite.render(screen)
+    for proj in Player.projectiles:
+        proj.render(screen)
+    for proj in Enemy.projectiles:
+        proj.render(screen)
+    for enemy in enemies:
+        enemy.render(screen)
     
-    # Do game stuff
-    # Update sprites
-    for sprite in sprites:
-        sprite.update()
-
-    # Render sprites
-    for sprite in sprites:
-        sprite.render(pen)
+def process_keys(keys, hero):
+    if keys[pygame.K_w]:
+        hero.sprite.movementVector[1] -= 1
+    if keys[pygame.K_a]:
+        hero.sprite.movementVector[0] -= 1
+    if keys[pygame.K_s]:
+        hero.sprite.movementVector[1] += 1
+    if keys[pygame.K_d]:
+        hero.sprite.movementVector[0] += 1
+    if keys[pygame.K_1]:
+        hero.sprite.equippedWeapon = hero.sprite.availableWeapons[0]
+    if keys[pygame.K_2]:
+        hero.sprite.equippedWeapon = hero.sprite.availableWeapons[1]
+    if keys[pygame.K_3]:
+        hero.sprite.equippedWeapon = hero.sprite.availableWeapons[2]
         
-    # Update the screen
-    wn.update()
+def process_mouse(mouse, hero):
+    if mouse[0]:
+        hero.sprite.shoot(pygame.mouse.get_pos())
+
+def update(self):
+        self.rotate() 
+
+def game_loop():
+    done = False
+    hero = pygame.sprite.GroupSingle(Player(screen.get_size()))
+    enemies = pygame.sprite.Group()
+    lastEnemy = pygame.time.get_ticks()
+    score = 0
+    
+    while hero.sprite.alive and not done:
+        keys = pygame.key.get_pressed()
+        mouse = pygame.mouse.get_pressed()
+        currentTime = pygame.time.get_ticks()
+        
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return True
+        screen.fill(BGCOLOR)
+        hero.update()
+        process_keys(keys, hero)
+        process_mouse(mouse, hero)
+        
+        # Enemy spawning process
+        if lastEnemy < currentTime - 200 and len(enemies) < 50:
+            spawnSide = random.random()
+            if spawnSide < 0.25:
+                enemies.add(Enemy((0, random.randint(0, size[1]))))
+            elif spawnSide < 0.5:
+                enemies.add(Enemy((size[0], random.randint(0, size[1]))))
+            elif spawnSide < 0.75:
+                enemies.add(Enemy((random.randint(0, size[0]), 0)))
+            else:
+                enemies.add(Enemy((random.randint(0, size[0]), size[1])))
+            lastEnemy = currentTime
+        
+        score += move_entities(hero, enemies, clock.get_time()/17)
+        render_entities(hero, enemies)
+        
+        # Health and score render
+        for hp in range(hero.sprite.health):
+            screen.blit(healthRender, (15 + hp*35, 0))
+        scoreRender = scoreFont.render(str(score), True, pygame.Color('black'))
+        scoreRect = scoreRender.get_rect()
+        scoreRect.right = size[0] - 20
+        scoreRect.top = 20
+        screen.blit(scoreRender, scoreRect)
+        
+        pygame.display.flip()
+        clock.tick(120)
+
+done = game_loop()
+while not done:
+    keys = pygame.key.get_pressed()
+    mouse = pygame.mouse.get_pressed()
+    currentTime = pygame.time.get_ticks()
+    
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            done = True
+    
+    if keys[pygame.K_r]:
+        done = game_loop()
+pygame.quit()

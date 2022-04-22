@@ -1,1 +1,1 @@
-# py-zombie-game
+# PY-ZOMBIE-GAME
