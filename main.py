@@ -72,8 +72,6 @@ def process_mouse(mouse, hero):
     if mouse[0]:
         hero.sprite.shoot(pygame.mouse.get_pos())
 
-def update(self):
-        self.rotate() 
 
 def game_loop():
     done = False
@@ -92,6 +90,7 @@ def game_loop():
             if event.type == pygame.QUIT:
                 return True
         screen.fill(BGCOLOR)
+        #asdasd
         hero.update()
         process_keys(keys, hero)
         process_mouse(mouse, hero)

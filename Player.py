@@ -1,6 +1,7 @@
 import pygame
 import math
 import Weapon
+from pygame.math import Vector2
 
 PLAYERCOLOR = (255,   0,   0)
 
@@ -14,12 +15,15 @@ class Player(pygame.sprite.Sprite):
     projectiles = pygame.sprite.Group()
     def __init__(self, screenSize):
         super().__init__()
-        self.image = pygame.Surface([8, 8])
-        self.image.fill(PLAYERCOLOR)
-        self.rect = self.image.get_rect(x=screenSize[0]//2,
-                                        y=screenSize[1]//2)
+        self.image = pygame.Surface((50, 30), pygame.SRCALPHA)
+        pygame.draw.polygon(self.image, pygame.Color('steelblue2'),
+                        [(0, 0), (50, 15), (0, 30)])
+        self.orig_image = self.image
+       
+        self.rect = self.image.get_rect(center=screenSize)
         
         self.pos = [screenSize[0] // 2, screenSize[1] // 2]
+        self.post = Vector2([screenSize[0] // 2, screenSize[1] // 2])
         self.health = 3
         self.alive = True
         self.movementVector = [0, 0]
@@ -52,7 +56,7 @@ class Player(pygame.sprite.Sprite):
         
     def rotate(self):
         # The vector to the target (the mouse position).
-        direction = pygame.mouse.get_pos() - self.pos
+        direction = pygame.mouse.get_pos() - self.post
         # .as_polar gives you the polar coordinates of the vector,
         # i.e. the radius (distance to the target) and the angle.
         radius, angle = direction.as_polar()
@@ -61,7 +65,9 @@ class Player(pygame.sprite.Sprite):
         # Create a new rect with the center of the old rect.
         self.rect = self.image.get_rect(center=self.rect.center)
         
-    
+    def update(self):
+        self.rotate()
+  
 
     def shoot(self, mousePos):
         self.equippedWeapon.shoot(self, mousePos)

@@ -31,7 +31,7 @@ class Player(pg.sprite.Sprite):
 pg.init()
 screen = pg.display.set_mode((640, 480))
 clock = pg.time.Clock()
-all_sprites = pg.sprite.Group(Player((300, 220)))
+all_sprites = pg.sprite.Group(Player((640/2, 480/2)))
 done = False
 
 while not done:

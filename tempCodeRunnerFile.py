@@ -1,1 +1,1 @@
-.update()
+screen.get_size()
