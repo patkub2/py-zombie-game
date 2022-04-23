@@ -1,1 +1,0 @@
-screen.get_size()

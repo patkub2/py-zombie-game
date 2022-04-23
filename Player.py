@@ -15,16 +15,16 @@ class Player(pygame.sprite.Sprite):
     projectiles = pygame.sprite.Group()
     def __init__(self, screenSize):
         super().__init__()
-        self.image = pygame.Surface((50, 30), pygame.SRCALPHA)
-        pygame.draw.polygon(self.image, pygame.Color('steelblue2'),
-                        [(0, 0), (50, 15), (0, 30)])
+        self.image =  pygame.image.load("player.png").convert_alpha()
         self.orig_image = self.image
-       
-        self.rect = self.image.get_rect(center=screenSize)
         
-        self.pos = [screenSize[0] // 2, screenSize[1] // 2]
-        self.post = Vector2([screenSize[0] // 2, screenSize[1] // 2])
-        self.health = 3
+        self.x = screenSize[0]
+        self.y = screenSize[1]
+        self.offset = Vector2(50,50)  # We shift the sprite 50 px to the right.
+        
+        self.pos = Vector2(screenSize[0]// 2, screenSize[1]// 2 )
+        self.rect = self.image.get_rect(center=(screenSize[0]// 2, screenSize[1]// 2 ))
+        self.health = 300
         self.alive = True
         self.movementVector = [0, 0]
         self.movementSpeed = 3
@@ -54,20 +54,23 @@ class Player(pygame.sprite.Sprite):
         self.rect.topleft = self.pos
         self.movementVector = [0, 0]
         
+    def update(self):
+        self.rotate()
+  
     def rotate(self):
-        # The vector to the target (the mouse position).
-        direction = pygame.mouse.get_pos() - self.post
+        
+        direction = pygame.mouse.get_pos() - self.pos
         # .as_polar gives you the polar coordinates of the vector,
         # i.e. the radius (distance to the target) and the angle.
         radius, angle = direction.as_polar()
         # Rotate the image by the negative angle (y-axis in pygame is flipped).
         self.image = pygame.transform.rotate(self.orig_image, -angle)
         # Create a new rect with the center of the old rect.
-        self.rect = self.image.get_rect(center=self.rect.center)
-        
-    def update(self):
-        self.rotate()
+        self.rect = self.image.get_rect(center=self.rect.center -self.offset)
+    
   
+        
+
 
     def shoot(self, mousePos):
         self.equippedWeapon.shoot(self, mousePos)

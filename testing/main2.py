@@ -1,35 +1,64 @@
-import math
-import pygame
+import pygame as pg
+from pygame.math import Vector2
 
-pygame.init()
-window = pygame.display.set_mode((300, 300))
-player = pygame.image.load("player.png").convert_alpha()
 
-#   0 - image is looking to the right
-#  90 - image is looking up
-# 180 - image is looking to the left
-# 270 - image is looking down
-correction_angle = 90
+class Entity(pg.sprite.Sprite):
 
-run = True
-while run:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
+    def __init__(self, pos):
+        super().__init__()
+        self.image = pg.Surface((122, 70), pg.SRCALPHA)
+        pg.draw.polygon(self.image, pg.Color('dodgerblue1'),
+                        ((1, 0), (120, 35), (1, 70)))
+        # A reference to the original image to preserve the quality.
+        self.orig_image = self.image
+        self.rect = self.image.get_rect(center=pos)
+        self.pos = Vector2(pos)  # The original center position/pivot point.
+        self.offset = Vector2(0,0)  # We shift the sprite 50 px to the right.
+        self.angle = 0
 
-    player_pos  = window.get_rect().center
-    player_rect = player.get_rect(center = player_pos)
+    def update(self):
+        self.rotate()
 
-    mx, my = pygame.mouse.get_pos()
-    dx, dy = mx - player_rect.centerx, my - player_rect.centery
-    angle = math.degrees(math.atan2(-dy, dx)) - correction_angle
+    def rotate(self):
+     
+        direction = pg.mouse.get_pos() - self.pos
+        # .as_polar gives you the polar coordinates of the vector,
+        # i.e. the radius (distance to the target) and the angle.
+        radius, angle = direction.as_polar()
+        # Rotate the image by the negative angle (y-axis in pygame is flipped).
+        self.image = pg.transform.rotate(self.orig_image, -angle)
+        # Create a new rect with the center of the old rect.
+        self.rect = self.image.get_rect(center=self.rect.center)
 
-    rot_image      = pygame.transform.rotate(player, angle)
-    rot_image_rect = rot_image.get_rect(center = player_rect.center)
 
-    window.fill((255, 255, 255))
-    window.blit(rot_image, rot_image_rect.topleft)
-    pygame.display.flip()
+def main():
+    screen = pg.display.set_mode((640, 480))
+    clock = pg.time.Clock()
+    entity = Entity((320, 240))
+    all_sprites = pg.sprite.Group(entity)
 
-pygame.quit()
-exit()
+    while True:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                return
+
+        keys = pg.key.get_pressed()
+        if keys[pg.K_d]:
+            entity.pos.x += 5
+        elif keys[pg.K_a]:
+            entity.pos.x -= 5
+
+        all_sprites.update()
+        screen.fill((30, 30, 30))
+        all_sprites.draw(screen)
+        pg.draw.circle(screen, (255, 128, 0), [int(i) for i in entity.pos], 3)
+        pg.draw.rect(screen, (255, 128, 0), entity.rect, 2)
+        pg.draw.line(screen, (100, 200, 255), (0, 240), (640, 240), 1)
+        pg.display.flip()
+        clock.tick(30)
+
+
+if __name__ == '__main__':
+    pg.init()
+    main()
+    pg.quit()

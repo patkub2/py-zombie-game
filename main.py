@@ -72,7 +72,7 @@ def process_mouse(mouse, hero):
     if mouse[0]:
         hero.sprite.shoot(pygame.mouse.get_pos())
 
-
+#GAME LOOP-================================================
 def game_loop():
     done = False
     hero = pygame.sprite.GroupSingle(Player(screen.get_size()))
@@ -91,6 +91,7 @@ def game_loop():
                 return True
         screen.fill(BGCOLOR)
         #asdasd
+
         hero.update()
         process_keys(keys, hero)
         process_mouse(mouse, hero)
@@ -124,6 +125,7 @@ def game_loop():
         clock.tick(120)
 
 done = game_loop()
+#END GAME LOOP-================================================
 while not done:
     keys = pygame.key.get_pressed()
     mouse = pygame.mouse.get_pressed()

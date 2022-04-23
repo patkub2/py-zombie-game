@@ -1,47 +1,35 @@
-import pygame as pg
-from pygame.math import Vector2
+import math
+import pygame
 
+pygame.init()
+window = pygame.display.set_mode((300, 300))
+player = pygame.image.load("player.png").convert_alpha()
 
-class Player(pg.sprite.Sprite):
+#   0 - image is looking to the right
+#  90 - image is looking up
+# 180 - image is looking to the left
+# 270 - image is looking down
+correction_angle = 90
 
-    def __init__(self, pos):
-        super().__init__()
-        self.image = pg.Surface((50, 30), pg.SRCALPHA)
-        pg.draw.polygon(self.image, pg.Color('steelblue2'),
-                        [(0, 0), (50, 15), (0, 30)])
-        self.orig_image = self.image  # Store a reference to the original.
-        self.rect = self.image.get_rect(center=pos)
-        self.pos = Vector2(pos)
+run = True
+while run:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
 
-    def update(self):
-        self.rotate()
+    player_pos  = window.get_rect().center
+    player_rect = player.get_rect(center = player_pos)
 
-    def rotate(self):
-        # The vector to the target (the mouse position).
-        direction = pg.mouse.get_pos() - self.pos
-        # .as_polar gives you the polar coordinates of the vector,
-        # i.e. the radius (distance to the target) and the angle.
-        radius, angle = direction.as_polar()
-        # Rotate the image by the negative angle (y-axis in pygame is flipped).
-        self.image = pg.transform.rotate(self.orig_image, -angle)
-        # Create a new rect with the center of the old rect.
-        self.rect = self.image.get_rect(center=self.rect.center)
+    mx, my = pygame.mouse.get_pos()
+    dx, dy = mx - player_rect.centerx, my - player_rect.centery
+    angle = math.degrees(math.atan2(-dy, dx)) - correction_angle
 
+    rot_image      = pygame.transform.rotate(player, angle)
+    rot_image_rect = rot_image.get_rect(center = player_rect.center)
 
-pg.init()
-screen = pg.display.set_mode((640, 480))
-clock = pg.time.Clock()
-all_sprites = pg.sprite.Group(Player((640/2, 480/2)))
-done = False
+    window.fill((255, 255, 255))
+    window.blit(rot_image, rot_image_rect.topleft)
+    pygame.display.flip()
 
-while not done:
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            done = True
-
-    all_sprites.update()
-    screen.fill((30, 30, 30))
-    all_sprites.draw(screen)
-
-    pg.display.flip()
-    clock.tick(30)
+pygame.quit()
+exit()
