@@ -26,8 +26,8 @@ def move_entities(hero, enemies, timeDelta):
     score = 0
     hero.sprite.move(screen.get_size(), timeDelta)
     for enemy in enemies:
-        enemy.move(enemies, hero.sprite.rect.topleft, timeDelta)
-        enemy.shoot(hero.sprite.rect.topleft)
+        enemy.move(enemies, hero.sprite.rect.center, timeDelta)
+        enemy.shoot(hero.sprite.rect.center)
     for proj in Enemy.projectiles:
         proj.move(screen.get_size(), timeDelta)
         if pygame.sprite.spritecollide(proj, hero, False):
@@ -75,6 +75,7 @@ def process_mouse(mouse, hero):
 #GAME LOOP-================================================
 def game_loop():
     done = False
+    player = Player(screen.get_size())
     hero = pygame.sprite.GroupSingle(Player(screen.get_size()))
     enemies = pygame.sprite.Group()
     lastEnemy = pygame.time.get_ticks()
@@ -92,9 +93,12 @@ def game_loop():
         screen.fill(BGCOLOR)
         #asdasd
 
-        hero.update()
+        
         process_keys(keys, hero)
         process_mouse(mouse, hero)
+        hero.update()
+        pygame.draw.circle(screen, (255, 128, 0), [int(i) for i in player.pos], 3)
+        pygame.draw.rect(screen, (255, 128, 0), player.rect, 2)
         
         # Enemy spawning process
         if lastEnemy < currentTime - 200 and len(enemies) < 50:
