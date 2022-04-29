@@ -51,6 +51,6 @@ class Enemy(pygame.sprite.Sprite):
             self.lastShot = currentTime
             self.projectiles.add(Projectile(self.pos,
                                             normalize_vector(direction),
-                                            3, 500, (255, 0, 0)))
+                                            3, 50, (255, 0, 0)))
     def render(self, surface):
         surface.blit(self.image, self.pos)
