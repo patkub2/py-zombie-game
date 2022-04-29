@@ -13,7 +13,7 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
         self.image =  pygame.image.load("enemy.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (20, 20)) 
+        self.image = pygame.transform.scale(self.image, (25, 25)) 
         self.rect = self.image.get_rect(x=pos[0], y=pos[1])
         self.radius = self.rect.width / 2
         

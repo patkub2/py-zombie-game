@@ -10,7 +10,7 @@ from EnemyNormal import EnemyNormal
 
 pygame.init()
 size    = (800, 600)
-BGCOLOR = (255, 255, 255)
+BGCOLOR = (158, 255, 166)
 screen = pygame.display.set_mode(size)
 scoreFont = pygame.font.Font("fonts/UpheavalPro.ttf", 30)
 healthFont = pygame.font.Font("fonts/OmnicSans.ttf", 50)
@@ -33,7 +33,7 @@ def move_entities(hero, enemies, timeDelta):
         if pygame.sprite.spritecollide(enemy, hero, False):
             enemy.kill()
             hero.sprite.health -= 1
-            if hero.sprite.health <= 0:
+            if hero.sprite.health <= 0: #kill player
                 hero.sprite.alive = False
   
     for proj in Player.projectiles:
@@ -82,27 +82,24 @@ def game_loop():
     enemies = pygame.sprite.Group()
     lastEnemyNormal = pygame.time.get_ticks()
     score = 0
-    
+
+    # If player alive loop
     while hero.sprite.alive and not done:
         keys = pygame.key.get_pressed()
         mouse = pygame.mouse.get_pressed()
         currentTime = pygame.time.get_ticks()
-        
-        
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return True
         screen.fill(BGCOLOR)
-        #asdasd
-
-        
         process_keys(keys, hero)
         process_mouse(mouse, hero)
         hero.update()
         
         
         # EnemyNormal spawning process
-        if lastEnemyNormal < currentTime - 2000 and len(enemies) < 50:
+        if lastEnemyNormal < currentTime - 200 and len(enemies) < 50:
             spawnSide = random.random()
             if spawnSide < 0.25:
                 enemies.add(EnemyNormal((0, random.randint(0, size[1]))))

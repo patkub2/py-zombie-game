@@ -16,7 +16,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, screenSize):
         super().__init__()
         self.image =  pygame.image.load("player.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (20, 20)) 
+        self.image = pygame.transform.scale(self.image, (25, 25)) 
         self.orig_image = self.image
         
         self.x = screenSize[0]
