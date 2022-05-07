@@ -110,7 +110,7 @@ def game_loop():
         
         
         # EnemyNormal spawning process
-        if lastEnemyNormal < currentTime - 200 and len(enemies) < 50:
+        if lastEnemyNormal < currentTime - (1000 - score*5 ) and len(enemies) < 50:
             spawnSide = random.random()
             if spawnSide < 0.25:
                 enemies.add(EnemyShoot((0, random.randint(0, size[1]))))
@@ -123,7 +123,7 @@ def game_loop():
             lastEnemyNormal = currentTime
         
         # Enemy and player render
-        score += move_entities(hero, enemies, clock.get_time()/17)
+        score += move_entities(hero, enemies, clock.get_time()/15)
         render_entities(hero, enemies)
         
         # Health and score render
