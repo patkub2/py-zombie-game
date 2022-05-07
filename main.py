@@ -5,7 +5,7 @@ import random
 import math
 from Player import Player
 from EnemyNormal import EnemyNormal
-from EnemyNormal import EnemyNormal
+from EnemyShoot import EnemyShoot
 
 
 pygame.init()
@@ -28,14 +28,23 @@ clock = pygame.time.Clock()
 def move_entities(hero, enemies, timeDelta):
     score = 0
     hero.sprite.move(screen.get_size(), timeDelta)
+    #Player shooting and score
     for enemy in enemies:
         enemy.move(enemies, hero.sprite.rect.center, timeDelta)
+        enemy.shoot(hero.sprite.rect.topleft)
         if pygame.sprite.spritecollide(enemy, hero, False):
             enemy.kill()
             hero.sprite.health -= 1
             if hero.sprite.health <= 0: #kill player
                 hero.sprite.alive = False
-  
+    for proj in EnemyShoot.projectiles:
+        proj.move(screen.get_size(), timeDelta)
+        if pygame.sprite.spritecollide(proj, hero, False):
+            proj.kill()
+            hero.sprite.health -= 1
+            if hero.sprite.health <= 0:
+                hero.sprite.alive = False
+    #Player shooting and score
     for proj in Player.projectiles:
         proj.move(screen.get_size(), timeDelta)
         enemiesHit = pygame.sprite.spritecollide(proj, enemies, True)
@@ -51,6 +60,8 @@ def render_entities(hero, enemies):
         proj.render(screen)
     for enemy in enemies:
         enemy.render(screen)
+    for proj in EnemyShoot.projectiles:
+        proj.render(screen)    
     
 #=========================== Player moving ============================
 def process_keys(keys, hero):
@@ -102,15 +113,16 @@ def game_loop():
         if lastEnemyNormal < currentTime - 200 and len(enemies) < 50:
             spawnSide = random.random()
             if spawnSide < 0.25:
-                enemies.add(EnemyNormal((0, random.randint(0, size[1]))))
+                enemies.add(EnemyShoot((0, random.randint(0, size[1]))))
             elif spawnSide < 0.5:
-                enemies.add(EnemyNormal((size[0], random.randint(0, size[1]))))
+                enemies.add(EnemyShoot((size[0], random.randint(0, size[1]))))
             elif spawnSide < 0.75:
                 enemies.add(EnemyNormal((random.randint(0, size[0]), 0)))
             else:
                 enemies.add(EnemyNormal((random.randint(0, size[0]), size[1])))
             lastEnemyNormal = currentTime
         
+        # Enemy and player render
         score += move_entities(hero, enemies, clock.get_time()/17)
         render_entities(hero, enemies)
         

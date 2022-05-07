@@ -44,6 +44,8 @@ class EnemyNormal(pygame.sprite.Sprite):
         self.pos[1] += self.movementVector[1] * 0.5  # dragged from the sprite it collided with
         
         self.rect.topleft = self.pos
-    
+    def shoot(self, playerPos):
+        currentTime = pygame.time.get_ticks()
+       
     def render(self, surface):
         surface.blit(self.image, self.pos)

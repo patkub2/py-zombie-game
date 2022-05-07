@@ -8,18 +8,18 @@ def normalize_vector(vector):
     pythagoras = math.sqrt(vector[0]*vector[0] + vector[1]*vector[1])
     return (vector[0] / pythagoras, vector[1] / pythagoras)
 
-class Enemy(pygame.sprite.Sprite):
+class EnemyShoot(pygame.sprite.Sprite):
     projectiles = pygame.sprite.Group()
     def __init__(self, pos):
         super().__init__()
-        self.image =  pygame.image.load("enemy.png").convert_alpha()
+        self.image =  pygame.image.load("EnemyShoot.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (25, 25)) 
         self.rect = self.image.get_rect(x=pos[0], y=pos[1])
         self.radius = self.rect.width / 2
         
         self.pos = list(pos)
         self.movementVector = [0, 0]
-        self.movementSpeed = 1.5
+        self.movementSpeed = 1
         self.lastShot = pygame.time.get_ticks()
         self.weaponCooldown = 1500
         
@@ -51,6 +51,6 @@ class Enemy(pygame.sprite.Sprite):
             self.lastShot = currentTime
             self.projectiles.add(Projectile(self.pos,
                                             normalize_vector(direction),
-                                            3, 50, (255, 0, 0)))
+                                            3, 700, (255, 0, 0)))
     def render(self, surface):
         surface.blit(self.image, self.pos)
