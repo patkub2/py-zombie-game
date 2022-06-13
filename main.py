@@ -2,7 +2,6 @@
 
 import pygame, sys
 import random
-import math
 from Player import Player
 from EnemyNormal import EnemyNormal
 from EnemyShoot import EnemyShoot
@@ -26,9 +25,16 @@ score = 0
 clock = pygame.time.Clock()
 BG = pygame.image.load("assets/BG.jpg")
 BGblured = pygame.image.load("assets/BGblured.png")
+pistol =  pygame.image.load("assets/pistol.png").convert_alpha()
+pistol = pygame.transform.scale(pistol, (35, 35)) 
+shotgun =  pygame.image.load("assets/shotgun.png").convert_alpha()
+shotgun = pygame.transform.scale(pistol, (35, 35)) 
+submachine =  pygame.image.load("assets/submachine-gun.png").convert_alpha()
+submachine = pygame.transform.scale(pistol, (35, 35)) 
 
 
-
+def get_font(size): # Returns Press-Start-2P in the desired size
+    return pygame.font.Font("fonts/font.ttf", size)
 
 #=========================== Damage calculation ============================
 def move_entities(hero, enemies, timeDelta):
@@ -70,7 +76,7 @@ def render_entities(hero, enemies):
         proj.render(screen)    
     
 #=========================== Player moving ============================
-def process_keys(keys, hero):
+def process_keys(keys, hero, score):
     if keys[pygame.K_w]:
         hero.sprite.movementVector[1] -= 1
     if keys[pygame.K_a]:
@@ -81,9 +87,9 @@ def process_keys(keys, hero):
         hero.sprite.movementVector[0] += 1
     if keys[pygame.K_1]:
         hero.sprite.equippedWeapon = hero.sprite.availableWeapons[0]
-    if keys[pygame.K_2]:
+    if keys[pygame.K_2]and score>50:
         hero.sprite.equippedWeapon = hero.sprite.availableWeapons[1]
-    if keys[pygame.K_3]:
+    if keys[pygame.K_3]and score>100:
         hero.sprite.equippedWeapon = hero.sprite.availableWeapons[2]
 
 #=========================== Player shooting ============================     
@@ -110,7 +116,7 @@ def game_loop():
             if event.type == pygame.QUIT:
                 return True
         screen.blit(BG, (0, 0))
-        process_keys(keys, hero)
+        process_keys(keys, hero, score)
         process_mouse(mouse, hero)
         hero.update()
         
@@ -141,12 +147,13 @@ def game_loop():
         scoreRect.top = 20
         screen.blit(scoreRender, scoreRect)
         
+        # Weapon render screen
+        
         pygame.display.flip()
         clock.tick(120)
     game_over(score)
 
-def get_font(size): # Returns Press-Start-2P in the desired size
-    return pygame.font.Font("fonts/font.ttf", size)
+#=========================== Game Over screen ============================  
 
 def game_over(score):
     while True:
@@ -179,6 +186,8 @@ def game_over(score):
                     game_loop()
 
         pygame.display.update()
+
+#=========================== Main menu ============================  
 
 def main_menu():
     while True:
