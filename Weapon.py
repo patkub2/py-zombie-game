@@ -60,7 +60,8 @@ class Shotgun(Weapon):
                 user.projectiles.add(Projectile(user.pos,
                                                 super().normalize_vector(projDir),
                                                 7, 500, (232, 144, 42)))
-                
+
+
 class MachineGun(Weapon):
     def __init__(self):
         super().__init__()
