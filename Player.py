@@ -15,8 +15,8 @@ class Player(pygame.sprite.Sprite):
     projectiles = pygame.sprite.Group()
     def __init__(self, screenSize):
         super().__init__()
-        self.image =  pygame.image.load("player.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (25, 25)) 
+        self.image =  pygame.image.load("assets/player.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (35, 35)) 
         self.orig_image = self.image
         
         self.x = screenSize[0]

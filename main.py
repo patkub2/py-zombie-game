@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import pygame
+import pygame, sys
 import random
 import math
 from Player import Player
 from EnemyNormal import EnemyNormal
 from EnemyShoot import EnemyShoot
+from button import Button
 
 
 pygame.init()
-size    = (800, 600)
+size    = (1280, 720)
 BGCOLOR = (158, 255, 166)
 screen = pygame.display.set_mode(size)
 scoreFont = pygame.font.Font("fonts/UpheavalPro.ttf", 30)
@@ -23,6 +24,11 @@ enemies = pygame.sprite.Group()
 lastEnemyNormal = 0
 score = 0
 clock = pygame.time.Clock()
+BG = pygame.image.load("assets/BG.jpg")
+BGblured = pygame.image.load("assets/BGblured.png")
+
+
+
 
 #=========================== Damage calculation ============================
 def move_entities(hero, enemies, timeDelta):
@@ -103,7 +109,7 @@ def game_loop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return True
-        screen.fill(BGCOLOR)
+        screen.blit(BG, (0, 0))
         process_keys(keys, hero)
         process_mouse(mouse, hero)
         hero.update()
@@ -138,17 +144,43 @@ def game_loop():
         pygame.display.flip()
         clock.tick(120)
 
-done = game_loop()
-#=========================== End main game loop ============================  
-while not done:
-    keys = pygame.key.get_pressed()
-    mouse = pygame.mouse.get_pressed()
-    currentTime = pygame.time.get_ticks()
-    
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            done = True
-    
-    if keys[pygame.K_r]:
-        done = game_loop()
-pygame.quit()
+def get_font(size): # Returns Press-Start-2P in the desired size
+    return pygame.font.Font("fonts/font.ttf", size)
+
+
+def main_menu():
+    while True:
+        screen.blit(BGblured, (0, 0))
+
+        MENU_MOUSE_POS = pygame.mouse.get_pos()
+
+        MENU_TEXT = get_font(100).render("MAIN MENU", True, "#ffffff")
+        MENU_RECT = MENU_TEXT.get_rect(center=(640, 200))
+
+        PLAY_BUTTON = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(640, 350), 
+                            text_input="PLAY", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+        
+        QUIT_BUTTON = Button(image=pygame.image.load("assets/Quit Rect.png"), pos=(640, 500), 
+                            text_input="QUIT", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+
+        screen.blit(MENU_TEXT, MENU_RECT)
+
+        for button in [PLAY_BUTTON,  QUIT_BUTTON]:
+            button.changeColor(MENU_MOUSE_POS)
+            button.update(screen)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    game_loop()
+                
+                if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    pygame.quit()
+                    sys.exit()
+
+        pygame.display.update()
+
+main_menu()
