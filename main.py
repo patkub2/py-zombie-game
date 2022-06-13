@@ -116,7 +116,7 @@ def game_loop():
         
         
         # EnemyNormal spawning process
-        if lastEnemyNormal < currentTime - (1000 - score*5 ) and len(enemies) < 50:
+        if lastEnemyNormal < currentTime - (1000 - score*10 ) and len(enemies) < 50:
             spawnSide = random.random()
             if spawnSide < 0.25:
                 enemies.add(EnemyShoot((0, random.randint(0, size[1]))))
@@ -143,10 +143,42 @@ def game_loop():
         
         pygame.display.flip()
         clock.tick(120)
+    game_over(score)
 
 def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("fonts/font.ttf", size)
 
+def game_over(score):
+    while True:
+        screen.blit(BGblured, (0, 0))
+
+        MENU_MOUSE_POS = pygame.mouse.get_pos()
+
+        MENU_TEXT = get_font(100).render("Game Over", True, "#ffffff")
+        MENU_RECT = MENU_TEXT.get_rect(center=(640, 200))
+
+        PLAY_BUTTON = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(640, 350), 
+                            text_input=str(score), font=get_font(75), base_color="#d7fcd4", hovering_color="#d7fcd4")
+        
+        RESTART_BUTTON = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 500), 
+                            text_input="RESTART", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+
+        screen.blit(MENU_TEXT, MENU_RECT)
+
+        for button in [PLAY_BUTTON,  RESTART_BUTTON]:
+            button.changeColor(MENU_MOUSE_POS)
+            button.update(screen)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                
+                if RESTART_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    game_loop()
+
+        pygame.display.update()
 
 def main_menu():
     while True:

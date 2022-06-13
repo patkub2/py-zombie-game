@@ -28,7 +28,7 @@ class Player(pygame.sprite.Sprite):
 
 
 
-        self.health = 10
+        self.health = 5
         self.alive = True
         self.movementVector = [0, 0]
         self.movementSpeed = 3
