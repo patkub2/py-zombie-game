@@ -100,7 +100,6 @@ def process_mouse(mouse, hero):
 #=========================== Main game loop ============================  
 def game_loop():
     done = False
-    player = Player(screen.get_size())
     hero = pygame.sprite.GroupSingle(Player(screen.get_size()))
     enemies = pygame.sprite.Group()
     lastEnemyNormal = pygame.time.get_ticks()
