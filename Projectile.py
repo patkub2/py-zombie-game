@@ -3,7 +3,7 @@ import pygame
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, source, target, speed, lifetime, color):
         super().__init__()
-        self.image = pygame.Surface([6, 6])
+        self.image = pygame.Surface([8, 8])
         self.image.set_colorkey(pygame.Color('black'))
         self.rect = self.image.get_rect(x=source[0], y=source[1])
         pygame.draw.circle(self.image, color,
