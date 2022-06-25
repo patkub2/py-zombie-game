@@ -27,29 +27,25 @@ score = 0
 clock = pygame.time.Clock()
 BG = pygame.image.load("assets/BG.jpg")
 BGblured = pygame.image.load("assets/BGblured.png")
-highscore = 0
 
 
-def store_highscore_in_file(dictionary, fn = "./high.txt", top_n=0):
-    """Store the dict into a file, only store top_n highest values."""
-    with open(fn,"w") as f:
-        for idx,(name,pts) in enumerate(sorted(dictionary.items(), key= lambda x:-x[1])):
-            f.write(f"{name}:{pts}\n")
-            if top_n and idx == top_n-1:
-                break
 
-def load_highscore_from_file(fn = "./high.txt"):
-    """Retrieve dict from file"""
-    hs = {}
-    try:
-        with open(fn,"r") as f:
-            for line in f:
-                name,_,points = line.partition(":")
-                if name and points:
-                    hs[name]=int(points)
-    except FileNotFoundError:
-        return {}
-    return hs
+
+def load_data():
+        # load high score
+        dir = path.dirname(__file__)
+        with open(path.join(dir, "highscore.txt"), 'r+') as f:
+            try:
+                return int(f.read())
+            except:
+                return 0
+
+def write_data(score):
+        # load high score
+        dir = path.dirname(__file__)
+        with open(path.join(dir, "highscore.txt"), 'w') as f:
+                f.write(str(score))
+        
 
 def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("fonts/font.ttf", size)
@@ -173,7 +169,12 @@ def game_loop():
 #=========================== Game Over screen ============================  
 
 def game_over(score):
-    kk = load_highscore_from_file()
+    highscore = load_data()
+    highscoretext = "HIGHSCORE:"+str(highscore)
+    if score > highscore:
+        highscoretext ="NEW HIGHSCORE!"
+        highscore = score
+        write_data(score)
     while True:
         screen.blit(BGblured, (0, 0))
 
@@ -182,14 +183,14 @@ def game_over(score):
         MENU_TEXT = get_font(100).render("Game Over", True, "#ffffff")
         MENU_RECT = MENU_TEXT.get_rect(center=(640, 200))
 
-        SCORE = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(640, 350), 
-                            text_input=str(score), font=get_font(75), base_color="#d7fcd4", hovering_color="#d7fcd4")
+        SCORE = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 360), 
+                            text_input="SCORE:"+str(score), font=get_font(40), base_color="#d7fcd4", hovering_color="#d7fcd4")
 
-        HIGHSCORE = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(640, 450), 
-                            text_input=str(list(kk.items())[0]), font=get_font(75), base_color="#d7fcd4", hovering_color="#d7fcd4")
+        HIGHSCORE = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 480), 
+                            text_input=highscoretext, font=get_font(40), base_color="#d7fcd4", hovering_color="#d7fcd4")
         
         RESTART_BUTTON = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 600), 
-                            text_input="RESTART", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+                            text_input="RESTART", font=get_font(50), base_color="#d7fcd4", hovering_color="White")
 
         screen.blit(MENU_TEXT, MENU_RECT)
 
@@ -208,6 +209,8 @@ def game_over(score):
 
         pygame.display.update()
 
+
+
 #=========================== Main menu ============================  
 
 def main_menu():
@@ -216,7 +219,7 @@ def main_menu():
 
         MENU_MOUSE_POS = pygame.mouse.get_pos()
 
-        MENU_TEXT = get_font(100).render("MAIN MENU", True, "#ffffff")
+        MENU_TEXT = get_font(70).render("ZOMBIE SHOOTER", True, "#ffffff")
         MENU_RECT = MENU_TEXT.get_rect(center=(640, 200))
 
         PLAY_BUTTON = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(640, 350), 
@@ -245,22 +248,7 @@ def main_menu():
 
         pygame.display.update()
 
-# file does not exist
-k = load_highscore_from_file()
-#print(k)
 
-## add some highscores to dict
-k["psa"]=12
-#k["a"]=110
-#k["k"]=1110
-#k["l"]=1022 
-#print(k)
-#
-# store file, only top 3
-store_highscore_in_file(k, top_n=3)
-
-# load back into new dict
-kk = load_highscore_from_file()
-print(list(k.items())[0])
-
+#score_board()
+#game_over(53)
 main_menu()
