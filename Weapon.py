@@ -59,7 +59,7 @@ class Shotgun(Weapon):
                 projDir = super().rotate_vector(direction, theta)
                 user.projectiles.add(Projectile(user.pos,
                                                 super().normalize_vector(projDir),
-                                                7, 500, (232, 144, 42)))
+                                                7, 1000, (69, 7, 48)))
 
 
 class MachineGun(Weapon):
@@ -78,4 +78,4 @@ class MachineGun(Weapon):
             projDir = super().rotate_vector(direction, theta)   
             user.projectiles.add(Projectile(user.pos,
                                             super().normalize_vector(projDir),
-                                            6, 1000, (194, 54, 16)))
+                                            6, 1500, (194, 54, 16)))

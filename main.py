@@ -8,7 +8,7 @@ from EnemyNormal import EnemyNormal
 from EnemyShoot import EnemyShoot
 from button import Button
 from os import path
-
+from datetime import datetime
 
 pygame.init()
 size    = (1280, 720)
@@ -18,6 +18,7 @@ scoreFont = pygame.font.Font("fonts/UpheavalPro.ttf", 30)
 healthFont = pygame.font.Font("fonts/OmnicSans.ttf", 50)
 healthRender = healthFont.render('z', True, pygame.Color('red'))
 pygame.display.set_caption("Top Down")
+gameDisplay = pygame.display.set_mode(size)
 
 done = False
 hero = pygame.sprite.GroupSingle(Player(screen.get_size()))
@@ -28,23 +29,42 @@ clock = pygame.time.Clock()
 BG = pygame.image.load("assets/BG.jpg")
 BGblured = pygame.image.load("assets/BGblured.png")
 
+pistol = pygame.image.load('assets/pistol.png')
+pistol = pygame.transform.scale(pistol, (80, 80)) 
+machinegun = pygame.image.load('assets/shotgun.png')
+machinegun = pygame.transform.scale(machinegun, (80, 80)) 
+shotgun = pygame.image.load('assets/submachinegun.png')
+shotgun = pygame.transform.scale(shotgun, (80, 80)) 
 
+def weapon(img):
+    gameDisplay.blit(img, (20,620))
 
-
-def load_data():
+def load_score():
         # load high score
-        dir = path.dirname(__file__)
-        with open(path.join(dir, "highscore.txt"), 'r+') as f:
+        with open('highscore.txt') as f:
+            first_line = f.readline()
             try:
-                return int(f.read())
+                return int(first_line)
             except:
                 return 0
 
-def write_data(score):
+                
+def load_date():
         # load high score
+        with open('highscore.txt') as f:
+            f.readline()
+            second_line = f.readline()
+            try:
+                return second_line
+            except:
+                return 0
+
+
+def write_data(score):
+        # write high score
         dir = path.dirname(__file__)
         with open(path.join(dir, "highscore.txt"), 'w') as f:
-                f.write(str(score))
+                f.write(str(score)+"\n"+datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         
 
 def get_font(size): # Returns Press-Start-2P in the desired size
@@ -101,10 +121,25 @@ def process_keys(keys, hero, score):
         hero.sprite.movementVector[0] += 1
     if keys[pygame.K_1]:
         hero.sprite.equippedWeapon = hero.sprite.availableWeapons[0]
-    if keys[pygame.K_2]and score>50:
+    if keys[pygame.K_2]and score>20:
         hero.sprite.equippedWeapon = hero.sprite.availableWeapons[1]
-    if keys[pygame.K_3]and score>100:
+    if keys[pygame.K_3]and score>40:
         hero.sprite.equippedWeapon = hero.sprite.availableWeapons[2]
+    if score==20:
+        hero.sprite.equippedWeapon = hero.sprite.availableWeapons[1]
+    if score==40:
+        hero.sprite.equippedWeapon = hero.sprite.availableWeapons[2]
+    
+
+#=========================== Player moving ============================
+def process_aviable_weapon(hero):
+    
+    if hero.sprite.equippedWeapon == hero.sprite.availableWeapons[0]:
+        weapon(pistol)
+    if hero.sprite.equippedWeapon == hero.sprite.availableWeapons[1]:
+        weapon(machinegun)
+    if hero.sprite.equippedWeapon == hero.sprite.availableWeapons[2]:
+        weapon(shotgun)
 
 #=========================== Player shooting ============================     
 def process_mouse(mouse, hero):
@@ -131,6 +166,7 @@ def game_loop():
         screen.blit(BG, (0, 0))
         process_keys(keys, hero, score)
         process_mouse(mouse, hero)
+        process_aviable_weapon(hero)
         hero.update()
         
         
@@ -169,10 +205,13 @@ def game_loop():
 #=========================== Game Over screen ============================  
 
 def game_over(score):
-    highscore = load_data()
+    highscore = load_score()
+    date = load_date()
+    
     highscoretext = "HIGHSCORE:"+str(highscore)
     if score > highscore:
         highscoretext ="NEW HIGHSCORE!"
+        date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         highscore = score
         write_data(score)
     while True:
@@ -182,6 +221,9 @@ def game_over(score):
 
         MENU_TEXT = get_font(100).render("Game Over", True, "#ffffff")
         MENU_RECT = MENU_TEXT.get_rect(center=(640, 200))
+
+        DATE_TEXT = get_font(20).render(str(date), True, "#ffffff")
+        DATE_RECT = DATE_TEXT.get_rect(center=(640, 515))
 
         SCORE = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 360), 
                             text_input="SCORE:"+str(score), font=get_font(40), base_color="#d7fcd4", hovering_color="#d7fcd4")
@@ -193,6 +235,7 @@ def game_over(score):
                             text_input="RESTART", font=get_font(50), base_color="#d7fcd4", hovering_color="White")
 
         screen.blit(MENU_TEXT, MENU_RECT)
+        screen.blit(DATE_TEXT, DATE_RECT)
 
         for button in [SCORE,HIGHSCORE,  RESTART_BUTTON]:
             button.changeColor(MENU_MOUSE_POS)
@@ -250,5 +293,5 @@ def main_menu():
 
 
 #score_board()
-#game_over(53)
+#game_over(23)
 main_menu()
